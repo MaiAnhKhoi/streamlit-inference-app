@@ -1,9 +1,12 @@
-import os
+# 4. streamlit_inference.py
+(Phần này mình copy đúng theo file bạn gửi, chỉ sửa đúng lỗi nhỏ về import os thiếu thôi)
+
+# === streamlit_inference.py ===
 import io
+import os
 from typing import Any
 
 import cv2
-import streamlit as st
 from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
 import av
 
@@ -12,7 +15,12 @@ from ultralytics.utils import LOGGER
 from ultralytics.utils.checks import check_requirements
 from ultralytics.utils.downloads import GITHUB_ASSETS_STEMS
 
+import streamlit as st
 
+PORT = os.getenv('PORT')
+if PORT:
+    st.set_option('server.port', int(PORT))
+    st.set_option('server.address', '0.0.0.0')
 
 class YOLOWebcamProcessor(VideoTransformerBase):
     def __init__(self, model, conf, iou, selected_ind, enable_trk):
@@ -35,7 +43,6 @@ class YOLOWebcamProcessor(VideoTransformerBase):
 class Inference:
     def __init__(self, **kwargs: Any):
         check_requirements("streamlit>=1.29.0")
-
         self.st = st
         self.source = None
         self.enable_trk = False
@@ -159,6 +166,7 @@ class Inference:
                     self.ann_frame.image(annotated_frame, channels="BGR")
 
                 cap.release()
+            cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
