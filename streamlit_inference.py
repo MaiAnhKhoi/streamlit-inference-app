@@ -112,7 +112,7 @@ class Inference:
         self.org_frame = col1.empty()  # Container for original frame
         self.ann_frame = col2.empty()  # Container for annotated frame
 
-    def source_upload(self):
+def source_upload(self):
     """Handle video file uploads through the Streamlit interface."""
     self.vid_file_name = ""
     if self.source == "video":
@@ -125,6 +125,7 @@ class Inference:
     else:
         self.st.warning("Webcam is not available on Streamlit Cloud. Please upload a video instead.")
         self.vid_file_name = None
+
 
 
     def configure(self):
