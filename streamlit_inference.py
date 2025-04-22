@@ -113,17 +113,19 @@ class Inference:
         self.ann_frame = col2.empty()  # Container for annotated frame
 
     def source_upload(self):
-        """Handle video file uploads through the Streamlit interface."""
-        self.vid_file_name = ""
-        if self.source == "video":
-            vid_file = self.st.sidebar.file_uploader("Upload Video File", type=["mp4", "mov", "avi", "mkv"])
-            if vid_file is not None:
-                g = io.BytesIO(vid_file.read())  # BytesIO Object
-                with open("ultralytics.mp4", "wb") as out:  # Open temporary file as bytes
-                    out.write(g.read())  # Read bytes into file
-                self.vid_file_name = "ultralytics.mp4"
-        elif self.source == "webcam":
-            self.vid_file_name = 0  # Use webcam index 0
+    """Handle video file uploads through the Streamlit interface."""
+    self.vid_file_name = ""
+    if self.source == "video":
+        vid_file = self.st.sidebar.file_uploader("Upload Video File", type=["mp4", "mov", "avi", "mkv"])
+        if vid_file is not None:
+            g = io.BytesIO(vid_file.read())  # BytesIO Object
+            with open("uploaded_video.mp4", "wb") as out:  # Save uploaded file
+                out.write(g.read())
+            self.vid_file_name = "uploaded_video.mp4"
+    else:
+        self.st.warning("Webcam is not available on Streamlit Cloud. Please upload a video instead.")
+        self.vid_file_name = None
+
 
     def configure(self):
         """Configure the model and load selected classes for inference."""
