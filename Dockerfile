@@ -19,5 +19,5 @@ COPY . .
 # Expose port
 EXPOSE 8501
 
-# Correct way to run streamlit with PORT fallback
+# Correctly start app
 CMD bash -c "streamlit run streamlit_inference.py --server.port=${PORT:-8501} --server.address=0.0.0.0"
