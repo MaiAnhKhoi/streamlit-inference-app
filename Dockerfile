@@ -19,5 +19,5 @@ COPY . .
 # Expose port
 EXPOSE 8501
 
-# Dùng bash -c để đọc biến $PORT
-ENTRYPOINT ["bash", "-c", "streamlit run streamlit_inference.py --server.port=${PORT:-8501} --server.address=0.0.0.0"]
+# Correct way to run streamlit with PORT fallback
+CMD bash -c "streamlit run streamlit_inference.py --server.port=${PORT:-8501} --server.address=0.0.0.0"
