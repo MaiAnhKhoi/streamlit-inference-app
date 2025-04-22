@@ -1,10 +1,9 @@
-# Ultralytics 🚀 AGPL-3.0 License - https://ultralytics.com/license
-
 import io
 from typing import Any
+
+import cv2
 from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
 import av
-import cv2
 
 from ultralytics import YOLO
 from ultralytics.utils import LOGGER
@@ -26,7 +25,8 @@ class YOLOWebcamProcessor(VideoTransformerBase):
             results = self.model.track(img, conf=self.conf, iou=self.iou, classes=self.selected_ind, persist=True)
         else:
             results = self.model(img, conf=self.conf, iou=self.iou, classes=self.selected_ind)
-        return results[0].plot()
+        img = results[0].plot()
+        return img
 
 
 class Inference:
@@ -46,7 +46,7 @@ class Inference:
         self.model = None
 
         self.temp_dict = {"model": None, **kwargs}
-        self.model_path = self.temp_dict["model"] if self.temp_dict["model"] else None
+        self.model_path = self.temp_dict.get("model")
 
         LOGGER.info(f"Ultralytics Solutions: ✅ {self.temp_dict}")
 
@@ -54,7 +54,7 @@ class Inference:
         menu_style_cfg = """<style>MainMenu {visibility: hidden;}</style>"""
         main_title_cfg = """<div><h1 style="color:#FF64DA; text-align:center; font-size:40px; margin-top:-50px;
         font-family: 'Archivo', sans-serif; margin-bottom:20px;">Ultralytics YOLO Streamlit Application</h1></div>"""
-        sub_title_cfg = """<div><h4 style="color:#042AFF; text-align:center; font-family: 'Archivo', sans-serif;
+        sub_title_cfg = """<div><h4 style="color:#042AFF; text-align:center; font-family: 'Archivo', sans-serif; 
         margin-top:-15px; margin-bottom:50px;">Experience real-time object detection on your webcam with the power 
         of Ultralytics YOLO! 🚀</h4></div>"""
 
@@ -84,17 +84,16 @@ class Inference:
             vid_file = self.st.sidebar.file_uploader("Upload Video File", type=["mp4", "mov", "avi", "mkv"])
             if vid_file is not None:
                 g = io.BytesIO(vid_file.read())
-                with open("ultralytics.mp4", "wb") as out:
+                with open("uploaded_video.mp4", "wb") as out:
                     out.write(g.read())
-                self.vid_file_name = "ultralytics.mp4"
+                self.vid_file_name = "uploaded_video.mp4"
         elif self.source == "webcam":
-            self.vid_file_name = 0  # Webcam mode
+            self.vid_file_name = 0
 
     def configure(self):
         available_models = [x.replace("yolo", "YOLO") for x in GITHUB_ASSETS_STEMS if x.startswith("yolo11")]
         if self.model_path:
             available_models.insert(0, self.model_path.split(".pt")[0])
-
         selected_model = self.st.sidebar.selectbox("Model", available_models)
 
         with self.st.spinner("Model is downloading..."):
@@ -104,6 +103,8 @@ class Inference:
 
         selected_classes = self.st.sidebar.multiselect("Classes", class_names, default=class_names[:3])
         self.selected_ind = [class_names.index(option) for option in selected_classes]
+        if not isinstance(self.selected_ind, list):
+            self.selected_ind = list(self.selected_ind)
 
     def inference(self):
         self.web_ui()
@@ -128,6 +129,7 @@ class Inference:
                     media_stream_constraints={"video": True, "audio": False},
                     rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
                 )
+
             else:
                 cap = cv2.VideoCapture(self.vid_file_name)
                 if not cap.isOpened():
@@ -155,10 +157,11 @@ class Inference:
                     self.ann_frame.image(annotated_frame, channels="BGR")
 
                 cap.release()
+            cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
     import sys
-
     args = len(sys.argv)
     model = sys.argv[1] if args > 1 else None
     Inference(model=model).inference()
