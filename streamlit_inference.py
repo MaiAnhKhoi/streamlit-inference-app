@@ -9,7 +9,10 @@ from ultralytics import YOLO
 from ultralytics.utils import LOGGER
 from ultralytics.utils.checks import check_requirements
 from ultralytics.utils.downloads import GITHUB_ASSETS_STEMS
-
+PORT = os.getenv('PORT')
+if PORT:
+    st.set_option('server.port', int(PORT))
+    st.set_option('server.address', '0.0.0.0')
 
 class YOLOWebcamProcessor(VideoTransformerBase):
     def __init__(self, model, conf, iou, selected_ind, enable_trk):
