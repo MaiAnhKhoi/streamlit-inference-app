@@ -1,4 +1,3 @@
-# Dockerfile
 FROM python:3.10
 
 # Install system dependencies
@@ -17,8 +16,8 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Copy app files
 COPY . .
 
-# Expose port for Streamlit
+# Expose port
 EXPOSE 8501
 
-# Run Streamlit app
-ENTRYPOINT bash -c "streamlit run streamlit_inference.py --server.port=\${PORT:-8501} --server.address=0.0.0.0"
+# Dùng bash -c để đọc biến $PORT
+ENTRYPOINT ["bash", "-c", "streamlit run streamlit_inference.py --server.port=${PORT:-8501} --server.address=0.0.0.0"]
