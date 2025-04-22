@@ -1,3 +1,4 @@
+# Dockerfile
 FROM python:3.10
 
 # Install system dependencies
@@ -6,18 +7,18 @@ RUN apt-get update && \
     xargs -r -a /tmp/apt.txt apt-get install -y && \
     rm -rf /var/lib/apt/lists/*
 
-# Set workdir
+# Set work directory
 WORKDIR /app
+
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Copy app files
 COPY . .
 
-# Install Python dependencies
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
-
-# Expose port
+# Expose port for Streamlit
 EXPOSE 8501
 
-# Run the app
-CMD streamlit run streamlit_inference.py --server.port=8501 --server.address=0.0.0.0
+# Run Streamlit app
+ENTRYPOINT bash -c "streamlit run streamlit_inference.py --server.port=\${PORT:-8501} --server.address=0.0.0.0"
