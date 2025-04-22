@@ -1,7 +1,9 @@
+import os
 import io
 from typing import Any
 
 import cv2
+import streamlit as st
 from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
 import av
 
@@ -9,6 +11,8 @@ from ultralytics import YOLO
 from ultralytics.utils import LOGGER
 from ultralytics.utils.checks import check_requirements
 from ultralytics.utils.downloads import GITHUB_ASSETS_STEMS
+
+# Bắt buộc phải import os và streamlit trước khi set PORT
 PORT = os.getenv('PORT')
 if PORT:
     st.set_option('server.port', int(PORT))
@@ -35,7 +39,6 @@ class YOLOWebcamProcessor(VideoTransformerBase):
 class Inference:
     def __init__(self, **kwargs: Any):
         check_requirements("streamlit>=1.29.0")
-        import streamlit as st
 
         self.st = st
         self.source = None
@@ -160,7 +163,6 @@ class Inference:
                     self.ann_frame.image(annotated_frame, channels="BGR")
 
                 cap.release()
-            cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
